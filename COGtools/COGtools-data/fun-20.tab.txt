@@ -1,0 +1,30 @@
+J	FCCCFC	Translation, ribosomal structure and biogenesi	1E75B0
+A	FCDCFC	RNA processing and modification	ABC3E3
+K	FCDCEC	Transcription	FA7D0E	
+L	FCDCDC	Replication, recombination and repair	FAB776
+B	FCDCCC	Chromatin structure and dynamics	2B9D2B
+D	FCFCDC	Cell cycle control, cell division, chromosome partitioning	95DB87
+Y	FCFCCC	Nuclear structure	D22627
+V	FCFCBC	Defense mechanisms	FA9593
+T	FCFCAC	Signal transduction mechanisms	9165B9
+M	ECFCAC	Cell wall/membrane/envelope biogenesis	C1ADD1
+N	DCFCAC	Cell motility	89544A
+Z	CCFCAC	Cytoskeleton	C09991
+W	BCFCAC	Extracellular structures	DF75BE
+U	ACFCAC	Intracellular trafficking, secretion, and vesicular transport	F2B2CE
+O	9CFCAC	Posttranslational modification, protein turnover, chaperones	7D7D7D
+X	9CFC9C	Mobilome: prophages, transposons	C3C3C3
+C	BCFCFC	Energy production and conversion	B8B921
+G	CCFCFC	Carbohydrate transport and metabolism	D7D78A
+E	DCFCFC	Amino acid transport and metabolism	17BACB
+F	DCECFC	Nucleotide transport and metabolism	9BD6E1
+H	DCDCFC	Coenzyme transport and metabolism	FFD131
+I	DCCCFC	Lipid transport and metabolism	F4AC32
+P	CCCCFC	Inorganic ion transport and metabolism	DBB3B1
+Q	BCCCFC	Secondary metabolites biosynthesis, transport and catabolism	A5BE00
+R	E0E0E0	General function prediction only	3D52D5
+S	CCCCCC	Function unknown	FFEEDD
+-	000000
+tRNA	D90368
+rRNA	FAF33E
+ncRNA	1EFC1E
