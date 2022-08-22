@@ -42,11 +42,13 @@ def consensus(organism_name, em_file=None, om_file=None, batch_file=None, fasta_
         for tool in nones:
             if tool is not None:
                 df = pd.read_csv(tool, sep='\t', comment='#')
-                df = categories_choice(df, cat_choice=cat_choice)
+                if cat_choice != 0:
+                    df = categories_choice(df, cat_choice=cat_choice)
 
     elif nones.count(None) == 0:
         df = create_consensus(em_file, om_file, batch_file)
-        df = categories_choice(df, cat_choice=cat_choice)
+        if cat_choice != 0:
+            df = categories_choice(df, cat_choice=cat_choice)
 
     else:
         print("Three files are needed to create consensus.")
@@ -111,11 +113,13 @@ def consensus_draft(organism_name, proteins=None, em_file=None, om_file=None, ba
         for tool in nones:
             if tool is not None:
                 df = pd.read_csv(tool, sep='\t', comment='#')
-                df = categories_choice_draft(df, cat_choice=cat_choice)
+                if cat_choice != 0:
+                    df = categories_choice_draft(df, cat_choice=cat_choice)
 
     elif nones.count(None) == 0:
         df = create_consensus_draft(proteins, em_file, om_file, batch_file)
-        df = categories_choice_draft(df, cat_choice=cat_choice)
+        if cat_choice != 0:
+            df = categories_choice_draft(df, cat_choice=cat_choice)
 
     else:
         print("Three files are needed to create consensus.")
