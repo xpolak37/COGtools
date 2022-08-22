@@ -80,10 +80,10 @@ def get_legend(font='arial.ttf',output_dir=os.getcwd(), cog_palette=True):
     for feature in features:
         feature = feature.split('\t')
         text = feature[0] if len(feature) == 2 else feature[0] + '  ' + feature[2]
-        if len(text) == 1:
-            color = ImageColor.getcolor('#' + feature[index], "RGB")
-        else:
+        if len(feature) == 2:
             color = ImageColor.getcolor('#' + feature[1], "RGB")
+        else:
+            color = ImageColor.getcolor('#' + feature[index], "RGB")
         text = 'COG unknown' if text == '-' else text
         image_edit.rectangle((50, start, 50+80, start+80), fill=color)
         image_edit.text((150, start+15), text, font=myFont, fill=(0, 0, 0))
