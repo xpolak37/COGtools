@@ -1,4 +1,4 @@
-# COGtools
+ # COGtools
 
 ## Introduction
 COGtools is a package for improving the functional annotation of bacterial genomes, classification of 
