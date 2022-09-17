@@ -60,7 +60,7 @@ def get_track_template(pos_track=(0.95, 0.90, 0.85, 0.80), size=10.0, cog_palett
     return track_template.to_csv(output_dir + '/track_template', sep='\t', index=False, mode='a')
 
 
-def get_legend(font='arial.ttf',output_dir=os.getcwd(), cog_palette=True):
+def get_legend(font='arial.ttf', output_dir=os.getcwd(), cog_palette=True):
     """
     Create a legend for the genome map
     """
@@ -72,7 +72,7 @@ def get_legend(font='arial.ttf',output_dir=os.getcwd(), cog_palette=True):
     # create a white image
     img = Image.new('RGB', (1700, 2500), 'white')
     image_edit = ImageDraw.Draw(img)
-    myFont = ImageFont.truetype(font, 50)
+    myFont = ImageFont.truetype(pkg_resources.resource_filename(__name__, 'COGtools-data/' + font), 50)
     start = 50
 
     # add individual objects to the legend
