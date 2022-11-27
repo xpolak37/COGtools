@@ -22,8 +22,11 @@ def get_track_template(pos_track=(0.95, 0.90, 0.85, 0.80), size=10.0, cog_palett
     index = 1 if cog_palette else 3
     for feature in features:
         feature = feature.split('\t')
-        if "RNA" not in feature[0] and "-" not in feature[0]:
-            color = ImageColor.getcolor('#' + feature[index], "RGB")
+        if "RNA" not in feature[0]:
+            if "-" in feature[0]:
+                color = ImageColor.getcolor('#' + feature[1], "RGB")
+            else:
+                color = ImageColor.getcolor('#' + feature[index], "RGB")
             color = str(color[0]) + ":" + str(color[1]) + ":" + str(color[2])
             new_row = pd.DataFrame(
                 {"#pos": [pos_track[0],pos_track[1],pos_track[2]],
