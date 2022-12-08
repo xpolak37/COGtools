@@ -19,7 +19,7 @@ def categories_barplot(path_to_data, names=None, draft=False, cog_palette=True, 
     :return: relative abundance of cog categories in the given genomes in csv file
     :return: barplots of relative abundance of cog categories in the given genomes
     """
-    header = "bacterium;J;A;K;L;B;D;Y;V;T;M;N;Z;W;U;O;X;C;G;E;F;H;I;P;Q;R;S;unknown;\n"
+    header = "bacterium;J;A;K;L;B;D;Y;V;T;M;N;Z;W;U;O;X;C;G;E;F;H;I;P;Q;R;S;unknown\n"
     organisms = [f for f in listdir(path_to_data) if isfile(join(path_to_data, f)) and f.endswith(".txt")]
     if names is None:
         names = organisms

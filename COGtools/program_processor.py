@@ -50,7 +50,7 @@ def em_processor(organism_name, em_file, cds_file, cogs_only=False, output_dir=o
 
         # add the information about location to the corresponding row of eggnog-mappers outputs
         em_data.loc[em_data.seqname == seq_id, ["seqname", "strand", "start", "end"]] = \
-            [seq_id[seq_id.index("|") + 1:seq_id.index("_prot")], dic['strand'], location[0], location[1]]
+            [search(r'(lcl.+[.]\d{1})', seq_id).group()[4:], dic['strand'], location[0], location[1]]
 
     for row in em_data.index:
         # get only useful information about each CDS: feature_id, name, COG, COG category
