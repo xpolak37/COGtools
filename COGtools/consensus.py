@@ -13,6 +13,8 @@ def read_file(file):
     data = pd.read_csv(file, sep='\t', comment='#')
     new_data = data[["start", "end"]]
     new_data.insert(2, "COG", [search('COG=(.*);CAT', og).group(1) for og in data["attribute"]], True)
+    new_data['start'] = new_data['start'].apply(str)
+    new_data['end'] = new_data['end'].apply(str) 
     return [data, new_data]
 
 
@@ -224,11 +226,13 @@ def create_consensus(em_file, om_file, batch_file):
     # merge the three dataframes to save all predicted features into one dataframe
     # cog_x = eggnog-mapper #cog_y = operon-operon-mapper #cog = batch cd-search
     new_df = pd.merge(new_em_data, new_om_data, on="start", how="outer")
+    #new_df = pd.concat([new_em_data, new_om_data], join="outer")
     new_df = (pd.merge(new_df, new_batch_data, on="start", how="outer")).fillna("-")
-
+    #new_df = pd.concat([new_df, new_batch_data], join="outer").fillna("-")
+    new_df['start'] = new_df['start'].apply(int)
     # create new DataFrame to store the necessary information
     df = pd.DataFrame(columns=["seqname", "source", "type", "start", "end", "score", "strand", "frame", "attribute"])
-
+    
     # data from COG database
     cogs_file = pkg_resources.resource_filename(__name__, 'COGtools-data/cogs.txt')
     cogs_data = (open(cogs_file, "r")).readlines()

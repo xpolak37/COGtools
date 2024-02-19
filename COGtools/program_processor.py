@@ -7,7 +7,7 @@ from Bio import Align
 import warnings
 
 
-def em_processor(organism_name, em_file, cds_file, cogs_only=False, output_dir=os.getcwd()):
+def em_processor(organism_name, em_file, gff_file, cogs_only=False, output_dir=os.getcwd()):
     """
     Process the output file (decorated.gff) from eggNOG-mapper tool into more structured COGtools-data.
     The outputs of this function is file in gff format that contains a suitable header with information about CDSs with
@@ -23,34 +23,21 @@ def em_processor(organism_name, em_file, cds_file, cogs_only=False, output_dir=o
     em_data = pd.read_csv(em_file, sep="\t", header=None, comment="#", names=("seqname", "source", "type", "start",
                                                                               "end", "score", "strand", "frame",
                                                                               "attribute"))
-    cds_data = SeqIO.parse(cds_file, "fasta")
-    # get only header of each CDS
-    desc = [record.description for record in cds_data]
-    # iterate through CDSs header
-
-    for record in desc:
-        seq_id = record[0:record.index(" [")]
-        # include all possible locations forward/reverse strand and join
-        dic = {'pattern': "complement\((.*?)\)", 'strand': "-"} if "complement" in record else \
-            {'pattern': "location=(.*?)]", 'strand': "+"}
-        location = search(dic['pattern'], record).group(1)
-
-        if "<" in location:
-            location = location[1:]
-
-        if "join" in location:
-            location = location[:-1] if location[-1] == ")" else location
-            location = (location[5:].split(".."))
-            location = [location[0], location[len(location) - 1]]
-        else:
-            location = location.split("..")
-
-        if ">" in location[1]:
-            location[1] = location[1][1:]
-
-        # add the information about location to the corresponding row of eggnog-mappers outputs
+    
+    gff_data = pd.read_csv(gff_file,comment="#", sep="\t",header=None,names=("seqname", "source", "type", "start",
+                                                                              "end", "score", "strand", "frame",
+                                                                              "attribute"))
+    
+    
+    for ind in gff_data.index:
+        attribute = gff_data["attribute"][ind]
+        seq_id = attribute[attribute.index("ID=")+3:attribute.index(";")]
+        start = gff_data["start"][ind]
+        end = gff_data["end"][ind]
+        strand = gff_data["strand"][ind]
+        
         em_data.loc[em_data.seqname == seq_id, ["seqname", "strand", "start", "end"]] = \
-            [search(r'(lcl.+[.]\d{1})', seq_id).group()[4:], dic['strand'], location[0], location[1]]
+            [seq_id,strand,start,end]
 
     for row in em_data.index:
         # get only useful information about each CDS: feature_id, name, COG, COG category
@@ -84,7 +71,7 @@ def em_processor(organism_name, em_file, cds_file, cogs_only=False, output_dir=o
                                                  ";desc=", dic['desc']])
 
     f = open(output_dir + '/em_' + organism_name + '.gff', 'w')
-    f.write('# created with COGtools 1.0.0\n# AC number: ' + em_data["seqname"][0] + "\n# Processed data from eggNOG-mapper\n")
+    f.write('# created with COGtools 1.0.0\n# AC number: ' + gff_data["seqname"][0] + "\n# Processed data from eggNOG-mapper\n")
     f.close()
     return em_data.to_csv(output_dir + '/em_' + organism_name + '.gff', sep='\t', index=False, mode = "a")
 
@@ -224,7 +211,7 @@ def batch_merger(organism_name, files, output_dir=os.getcwd()):
         file.write(data1)
 
 
-def batch_processor(organism_name, batch_file, output_dir=os.getcwd()):
+def batch_processor(organism_name, batch_file, gff_file, output_dir=os.getcwd()):
     """
     Process the outputs file (hitdata.txt) from Batch CD-Search tool into more structured COGtools-data.
     The outputs of this function is file in gff format that contains a suitable header with information about CDSs with
@@ -244,6 +231,9 @@ def batch_processor(organism_name, batch_file, output_dir=os.getcwd()):
     cogs_file = pkg_resources.resource_filename(__name__, 'COGtools-data/cogs.txt')
     cogs_data = (open(cogs_file, "r")).readlines()
 
+    gff_data = pd.read_csv(gff_file,comment="#", sep="\t",header=None,names=("seqname", "source", "type", "start",
+                                                                              "end", "score", "strand", "frame",
+                                                                              "attribute"))
     # iterate through queries
     for row in batch_data:
         new_query = search('Q#\d+', row).group(0)
@@ -253,36 +243,19 @@ def batch_processor(organism_name, batch_file, output_dir=os.getcwd()):
             continue
 
         query = new_query
-        seq_id = row[row.index("|") + 1:row.index("_prot")]
-        id = row[row.index("|") + 1:row.index(" [")]
+        seq_id = row[row.index(">") + 1:row.index("\t")]
+        id = row[row.index(">") + 1:row.index("\t")]
         id = "".join(["ID=", id])
-
-        # include all possible locations forward/reverse strand and join
-        dic = {'pattern': "complement\((.*?)\)", 'strand': '-'} if 'complement' in row else \
-            {'pattern': "location=(.*?)]", 'strand': '+'}
-        location = search(dic['pattern'], row).group(1)
-
-        if "<" in location:
-            location = location[1:]
-
-        if "join" in location:
-            location = location[:-1] if location[-1] == ")" else location
-            location = (location[5:].split(".."))
-            location = [location[0], location[len(location) - 1]]
-
-        else:
-            location = location.split("..")
-            location = [location[0], location[1]]
-
-        if ">" in location[1]:
-            location[1] = location[1][1:]
-
+        correct_row = gff_data.loc[gff_data.attribute.str.contains("("  + seq_id + ");"), :]
+        start = correct_row["start"].values[0]
+        end = correct_row["end"].values[0]
+        strand = correct_row["strand"].values[0]
         try:
             COG = "".join(["COG=", search("(COG\d+)", row).group(1)])
 
         except AttributeError:
             continue
-
+        
         # update in COG 2021
         if COG == "COG=COG3512":
             COG = "COG=COG1343"
@@ -294,13 +267,13 @@ def batch_processor(organism_name, batch_file, output_dir=os.getcwd()):
 
         attribute = id + ";" + COG + ";" + CAT + ";"
         new_row = pd.DataFrame(
-            {"seqname": [seq_id], "source": ["batch-cd-search"], "type": ["CDS"], "start": [location[0]], "end": [location[1]],
-             "score": ["."], "strand": [dic["strand"]], "frame": ["0"], "attribute": [attribute]})
+            {"seqname": [seq_id], "source": ["batch-cd-search"], "type": ["CDS"], "start": [start], "end": [end],
+             "score": ["."], "strand": [strand], "frame": ["0"], "attribute": [attribute]})
 
         batch_gff = pd.concat([batch_gff, new_row], ignore_index=True)
 
     f = open(output_dir + '/batch_' + organism_name + '.gff', 'w')
-    f.write('# created with COGtools 1.0.0\n# AC number: ' + seq_id +
+    f.write('# created with COGtools 1.0.0\n# AC number: ' + gff_data["seqname"][0] +
             "\n# Processed data from Batch CD-Search\n")
     f.close()
     return batch_gff.to_csv(output_dir + '/batch_' + organism_name + '.gff', sep='\t', index=False, mode = "a")
